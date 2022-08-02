@@ -1,7 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const router = require('./routes/user-routes');
 
 const app = express();
+
+app.use('/api', router);
 
 mongoose
     .connect(`mongodb+srv://Pst:VToqLPifOQYg56r0@cluster0.r716vhi.mongodb.net/auth?retryWrites=true&w=majority`)
