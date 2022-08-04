@@ -22,13 +22,32 @@ const signup = async (req, res, next) => {
         email,
         password: hashedPassword,
     });
+
     try {
         await user.save();
     } catch (err) {
         console.log(err);
     }
-
     return res.status(201).json({ message: user })
 }
 
-exports.signup = signup;
+const login = async (req, res, next) => {
+    const { email, password } = req.body;
+
+    let existingUser;
+    try {
+        existingUser = await User.findOne({ email: email });
+    } catch (err) {
+        return new Error(err);
+    }
+    if (!existingUser) {
+        return res.status(400).json({ message: "User not found. Signup Please" });
+    }
+    const isPasswordCorrect = bcrypt.compareSync(password, existingUser.password);
+    if (!isPasswordCorrect) {
+        return res.status(400).json({ message: "Inavlid Email / Password" });
+    }
+    return res.status(200).json({ message: "Successfully Logged In" });
+}
+    exports.signup = signup;
+    exports.login = login;
