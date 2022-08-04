@@ -52,7 +52,14 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign({ id: existingUser._id }, JWT_SECRET_KEY, {
-        expiresIn: "1hr",
+        expiresIn: "30s",
+    });
+
+    res.cookie(String(existingUser._id), token, {
+        path: '/',
+        expires: new Date(Date.now() + 1000 * 30),
+        httpOnly: true,
+        sameSite: 'lax'
     });
 
     console.log("Generated Token\n", token);
@@ -63,8 +70,9 @@ const login = async (req, res, next) => {
 };
 
 const verifyToken = (req, res, next) => {
-    const headers = req.headers[`authorization`];
-    const token = headers.split(' ')[1];
+    const cookies = req.headers.cookie;
+    const token = cookies.split('=')[1];
+    console.log(token);
     if (!token) {
         res.status(404).json({ message: 'No token found' })
     }
